@@ -1,20 +1,21 @@
 {
-<<<<<<< HEAD
-  "devDependencies": {
-    "@faker-js/faker": "^10.1.0",
-=======
-  "name": "qabrains-playwright-automation",
+  "name": "automation-exercise-playwright",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright automation framework for automationexercise.com",
   "main": "index.js",
-  "scripts": {},
-  "keywords": [],
+  "type": "commonjs",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report"
+  },
+  "keywords": ["playwright", "automation", "testing"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
->>>>>>> 329c06a8bdbc44b313f38a3ca7e784f4d4f839c9
     "@playwright/test": "^1.57.0",
-    "@types/node": "^24.10.1"
+    "@types/node": "^24.10.1",
+    "@faker-js/faker": "^10.1.0"
   }
 }
