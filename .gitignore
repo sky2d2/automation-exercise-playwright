@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 node_modules/
 package-lock.json
@@ -32,3 +33,13 @@ downloads/
 .cache/
 dist/
 coverage/
+=======
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+>>>>>>> 329c06a8bdbc44b313f38a3ca7e784f4d4f839c9
