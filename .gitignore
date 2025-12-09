@@ -1,7 +1,6 @@
 <<<<<<< HEAD
 # Dependencies
 node_modules/
-package-lock.json
 
 # Playwright
 playwright-report/
