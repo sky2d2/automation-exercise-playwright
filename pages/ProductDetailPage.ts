@@ -14,10 +14,14 @@ export class ProductDetailPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
+
+    // Product information
     this.productName = page.locator('.product-information h2');
     this.productPrice = page.locator('.product-information span span');
     this.quantityInput = page.locator('#quantity');
     this.addToCartButton = page.locator('button:has-text("Add to cart")');
+
+    // Review section
     this.reviewNameInput = page.locator('#name');
     this.reviewEmailInput = page.locator('#email');
     this.reviewTextarea = page.locator('#review');
@@ -29,14 +33,21 @@ export class ProductDetailPage extends BasePage {
     await this.goto(`/product_details/${productId}`);
   }
 
+  // 🔥 Added getter method (fixes your failing test)
+  async getProductName(): Promise<string> {
+    return (await this.productName.textContent())?.trim() ?? '';
+  }
+
+  async getProductPrice(): Promise<string> {
+    return (await this.productPrice.textContent())?.trim() ?? '';
+  }
+
   async setQuantity(quantity: number): Promise<void> {
-    await this.quantityInput.clear();
     await this.quantityInput.fill(quantity.toString());
   }
 
   async getQuantity(): Promise<number> {
-    const value = await this.quantityInput.inputValue();
-    return parseInt(value) || 1;
+    return parseInt(await this.quantityInput.inputValue()) || 1;
   }
 
   async clickAddToCart(): Promise<void> {

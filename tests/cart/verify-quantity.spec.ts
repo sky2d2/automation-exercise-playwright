@@ -15,25 +15,32 @@ test.describe('Verify Product Quantity in Cart', () => {
   });
 
   test('TC13: Verify product quantity in cart', async ({ page }) => {
+    // 1. Navigate to home + products page
     await page.goto('/');
     await productsPage.gotoProductsPage();
 
+    // 2. Open first product
     await page.locator('a:has-text("View Product")').first().click();
     await expect(productDetailPage.productName).toBeVisible();
 
-    const productName = await productDetailPage.productName.textContent();
+    // 3. Get product name using POM method
+    const productName = await productDetailPage.getProductName();
 
-    await productDetailPage.setQuantity(4);
+    // 4. Update quantity & add to cart
+    const expectedQty = 4;
+    await productDetailPage.setQuantity(expectedQty);
     await productDetailPage.clickAddToCart();
 
+    // 5. Open cart
     await page.locator('.modal-content a:has-text("View Cart")').click();
 
     await cartPage.assertCartPageVisible();
-    await cartPage.assertProductInCart(productName!);
+    await cartPage.assertProductInCart(productName);
 
-    const qty = await cartPage.getProductQuantity(productName!);
+    // 6. Validate quantity in cart
+    const qty = await cartPage.getProductQuantity(productName);
     const numericQty = parseInt(qty.replace(/[^0-9]/g, ''));
 
-    expect(numericQty).toBe(4);
+    expect(numericQty).toBe(expectedQty);
   });
 });
