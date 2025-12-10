@@ -9,6 +9,7 @@ import { OrderConfirmationPage } from '../../pages/OrderConfirmationPage';
 import { generateUser } from '../../utils/dataGenerator';
 import { testCardDetails } from '../../utils/testData';
 import * as path from 'path';
+import * as fs from 'fs';
 
 test.describe('Download Invoice after Purchase', () => {
   test('TC24: Download invoice after purchase confirmation', async ({ page }) => {
@@ -22,6 +23,7 @@ test.describe('Download Invoice after Purchase', () => {
 
     const user = generateUser();
 
+    // 1. Create account
     await signupPage.goto('/login');
     await signupPage.signup(user.name, user.email);
     await accountPage.fillAccountInformation(user);
@@ -30,33 +32,58 @@ test.describe('Download Invoice after Purchase', () => {
     await accountPage.assertAccountCreated();
     await accountPage.clickContinue();
 
+    // 2. Add product to cart
     await productsPage.gotoProductsPage();
     await productsPage.hoverAndAddToCart(0);
     await productsPage.clickViewCartInModal();
 
+    // 3. Proceed to checkout
     await cartPage.proceedToCheckout();
 
+    // 4. Place order
     await checkoutPage.addComment('Please deliver soon');
     await checkoutPage.clickPlaceOrder();
 
+    // 5. Complete payment
     await paymentPage.completePayment(testCardDetails);
 
+    // 6. Verify order placed
     await confirmationPage.assertOrderPlaced();
+    await page.waitForTimeout(1000);
 
-    const downloadPromise = page.waitForEvent('download');
-    await page.locator('a:has-text("Download Invoice")').click();
-    const download = await downloadPromise;
+    // 7. Verify Download Invoice button is visible
+    const isVisible = await confirmationPage.isDownloadInvoiceVisible();
+    expect(isVisible).toBeTruthy();
+
+    // 8. Download invoice
+    const download = await confirmationPage.downloadInvoice();
+
+    // 9. Validate download
+    const downloadPath = await download.path();
+    expect(downloadPath).toBeTruthy();
 
     const filename = download.suggestedFilename();
+    console.log(`📄 Downloaded file: ${filename}`);
     expect(filename).toContain('invoice');
 
-    const savePath = path.join('downloads', filename);
-    const fs = require('fs');
-    if (!fs.existsSync('downloads')) fs.mkdirSync('downloads');
-    await download.saveAs(savePath);
+    // 10. Save invoice to downloads folder
+    const downloadsDir = path.join('downloads');
+    if (!fs.existsSync(downloadsDir)) {
+      fs.mkdirSync(downloadsDir, { recursive: true });
+    }
 
+    const savePath = path.join(downloadsDir, filename);
+    await download.saveAs(savePath);
+    console.log(`💾 Saved to: ${savePath}`);
+
+    // 11. Verify file exists
+    expect(fs.existsSync(savePath)).toBeTruthy();
+
+    // 12. Cleanup - Delete account
     await confirmationPage.clickContinue();
     await accountPage.deleteAccount();
     await accountPage.assertAccountDeleted();
+
+    console.log('✅ Test completed successfully!');
   });
 });

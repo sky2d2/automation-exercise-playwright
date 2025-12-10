@@ -70,8 +70,20 @@ export class ProductsPage extends BasePage {
   }
 
   async clickViewCartInModal(): Promise<void> {
-    // Click "View Cart" link inside the added-to-cart modal
-    await this.page.locator('.modal-content a:has-text("View Cart")').click();
+    // Wait for modal to appear and click "View Cart"
+    await this.page.waitForSelector('.modal-content', { timeout: 5000 }).catch(() => {});
+    
+    // Try multiple selectors
+    const viewCartLink = this.page.locator('a:has-text("View Cart")').first();
+    
+    if (await viewCartLink.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await viewCartLink.click({ force: true });
+    } else {
+      // Fallback: use keyboard shortcut or escape and navigate
+      await this.page.keyboard.press('Escape');
+      await this.page.waitForTimeout(500);
+      await this.navigateToCart();
+    }
   }
 
   async getProductCount(): Promise<number> {
