@@ -11,8 +11,12 @@ import { testCardDetails } from '../../utils/testData';
 import * as path from 'path';
 import * as fs from 'fs';
 
+/**
+ * Test suite: Download Invoice after Purchase
+ */
 test.describe('Download Invoice after Purchase', () => {
   test('TC24: Download invoice after purchase confirmation', async ({ page }) => {
+    // Initialize page objects
     const signupPage = new SignupLoginPage(page);
     const accountPage = new AccountPage(page);
     const productsPage = new ProductsPage(page);
@@ -21,6 +25,7 @@ test.describe('Download Invoice after Purchase', () => {
     const paymentPage = new PaymentPage(page);
     const confirmationPage = new OrderConfirmationPage(page);
 
+    // Generate a new user
     const user = generateUser();
 
     // 1. Create account
@@ -58,7 +63,7 @@ test.describe('Download Invoice after Purchase', () => {
     // 8. Download invoice
     const download = await confirmationPage.downloadInvoice();
 
-    // 9. Validate download
+    // 9. Validate downloaded file
     const downloadPath = await download.path();
     expect(downloadPath).toBeTruthy();
 
@@ -66,7 +71,7 @@ test.describe('Download Invoice after Purchase', () => {
     console.log(`📄 Downloaded file: ${filename}`);
     expect(filename).toContain('invoice');
 
-    // 10. Save invoice to downloads folder
+    // 10. Save invoice to local downloads folder
     const downloadsDir = path.join('downloads');
     if (!fs.existsSync(downloadsDir)) {
       fs.mkdirSync(downloadsDir, { recursive: true });
@@ -76,10 +81,10 @@ test.describe('Download Invoice after Purchase', () => {
     await download.saveAs(savePath);
     console.log(`💾 Saved to: ${savePath}`);
 
-    // 11. Verify file exists
+    // 11. Verify file exists on disk
     expect(fs.existsSync(savePath)).toBeTruthy();
 
-    // 12. Cleanup - Delete account
+    // 12. Cleanup - delete account
     await confirmationPage.clickContinue();
     await accountPage.deleteAccount();
     await accountPage.assertAccountDeleted();
