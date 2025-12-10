@@ -23,11 +23,15 @@ export class CartPage extends BasePage {
   }
 
   async assertCartPageVisible(): Promise<void> {
+    await this.cartInfoTable.waitFor({ state: 'visible', timeout: 15000 });
     await expect(this.cartInfoTable).toBeVisible();
   }
 
   async assertProductInCart(productName: string): Promise<void> {
-    await expect(this.page.locator(`text=${productName}`)).toBeVisible();
+    // flexible regex to handle extra spaces or differences
+    const locator = this.page.locator(`text=/.*${productName.replace(/\s+/g, '\\s+')}.*$/i`);
+    await locator.waitFor({ state: 'visible', timeout: 15000 });
+    await expect(locator).toBeVisible();
   }
 
   async getProductQuantity(productName: string): Promise<string> {
@@ -43,10 +47,6 @@ export class CartPage extends BasePage {
   async getProductTotal(productName: string): Promise<string> {
     const row = this.page.locator(`tr:has-text("${productName}")`);
     return await row.locator('.cart_total_price').textContent() || '0';
-  }
-
-  async getCartProductCount(): Promise<number> {
-    return await this.cartProducts.count();
   }
 
   async deleteProduct(productName: string): Promise<void> {

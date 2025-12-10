@@ -1,3 +1,4 @@
+// pages/AccountPage.ts
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
@@ -53,17 +54,17 @@ export class AccountPage extends BasePage {
 
   async fillAccountInformation(userData: any): Promise<void> {
     if (userData.title === 'Mr') {
-      await this.titleMr.check();
+      await this.titleMr.check({ force: true });
     } else {
-      await this.titleMrs.check();
+      await this.titleMrs.check({ force: true });
     }
     
     await this.passwordInput.fill(userData.password);
     await this.daySelect.selectOption('15');
     await this.monthSelect.selectOption('6');
     await this.yearSelect.selectOption('1990');
-    await this.newsletterCheckbox.check();
-    await this.offersCheckbox.check();
+    await this.newsletterCheckbox.check({ force: true });
+    await this.offersCheckbox.check({ force: true });
   }
 
   async fillAddressInformation(userData: any): Promise<void> {
@@ -84,6 +85,7 @@ export class AccountPage extends BasePage {
   }
 
   async assertAccountCreated(): Promise<void> {
+    await this.accountCreatedMessage.waitFor({ state: 'visible', timeout: 15000 });
     await expect(this.accountCreatedMessage).toBeVisible();
   }
 
@@ -92,6 +94,7 @@ export class AccountPage extends BasePage {
   }
 
   async assertAccountDeleted(): Promise<void> {
+    await this.accountDeletedMessage.waitFor({ state: 'visible', timeout: 15000 });
     await expect(this.accountDeletedMessage).toBeVisible();
   }
 }

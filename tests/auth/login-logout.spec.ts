@@ -14,35 +14,38 @@ test.describe('Login and Logout Flow', () => {
   });
 
   test('TC2: Login with valid credentials and logout', async ({ page }) => {
-    // First create a test user
     const userData = generateUser();
-    
-    // Register user
+
+    // --- Register new user ---
     await signupLoginPage.gotoLoginPage();
     await signupLoginPage.signup(userData.name, userData.email);
+    await page.locator('text=Enter Account Information').waitFor({ state: 'visible', timeout: 15000 });
+
     await accountPage.fillAccountInformation(userData);
     await accountPage.fillAddressInformation(userData);
     await accountPage.submitAccountCreation();
+    await accountPage.assertAccountCreated();
     await accountPage.clickContinue();
-    
-    // Logout
+
+    // --- Logout ---
     await signupLoginPage.logout();
     await expect(page).toHaveURL(/.*login/);
-    
-    // Login back
+
+    // --- Login back ---
     await signupLoginPage.login(userData.email, userData.password);
     await expect(page.locator(`text=Logged in as ${userData.name}`)).toBeVisible();
-    
-    // Cleanup
+
+    // --- Cleanup ---
     await accountPage.deleteAccount();
     await accountPage.assertAccountDeleted();
+    await accountPage.clickContinue();
   });
 
   test('TC3: Login with invalid credentials', async ({ page }) => {
     await signupLoginPage.gotoLoginPage();
     await signupLoginPage.login('invalid@test.com', 'wrongpassword');
-    
-    // Verify error message
+
+    await page.locator('text=Your email or password is incorrect!').waitFor({ state: 'visible', timeout: 10000 });
     await signupLoginPage.assertLoginFailed();
   });
 });
