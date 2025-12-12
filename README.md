@@ -192,7 +192,6 @@ automation-exercise-playwright/
 ├── utils/                      # Utilities and test data
 │   ├── dataGenerator.ts
 │   └── testData.ts
-├── fixtures/                   # Test fixtures and files
 ├── downloads/                  # Downloaded files (invoices, etc.)
 ├── playwright.config.ts        # Playwright configuration
 └── package.json                # Dependencies and scripts
